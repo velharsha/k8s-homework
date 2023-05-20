@@ -1,0 +1,82 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-userapi
+  namespace: test-userapi
+  labels:
+    app: test-userapi
+spec:
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  replicas:
+  selector:
+    matchLabels:
+      app: test-userapi
+  template:
+    metadata:
+      labels:
+        app: test-userapi
+    spec:
+#      imagePullSecrets:
+#      - name: docker-pull-secret
+      containers:
+      - image: sriharshav54/userapi:v1.4
+        name: test-userapi
+        imagePullPolicy: Always
+        env:
+#        - name: MYSQL_DATABASE_USER
+#          value: root
+        - name: db_root_password
+          valueFrom:
+             secretKeyRef:
+               name: db-credentials
+               key: password
+        - name: db_name
+          value: mysql
+        - name: MYSQL_SERVICE_HOST
+          value: test-mysql-database
+        - name: MYSQL_SERVICE_PORT
+          value: "5432"
+        resources: 
+          limits:
+            cpu: "2"
+            memory: 4096Mi
+          requests:
+            cpu: "1"
+            memory: 1024Mi
+        ports:
+          - containerPort: 5000
+            name: http
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: test-userapi
+  namespace: test-userapi
+  labels:
+    app: test-userapi
+spec:
+  selector:
+    app: test-userapi
+  ports:
+    - name: http
+      port: 5000
+      targetPort: http
+      protocol: TCP
+  type: ClusterIP
+
+## Secrets shouldnt be placed directly in the repositry, 
+## but in our case just to show what objects are required, im doing this
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: db-credentials
+type: Opaque
+data:
+  password: cGFzc3dvcmQK ## encoded in base64
