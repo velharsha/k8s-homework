@@ -1,0 +1,26 @@
+replicaCount: 1
+
+image:
+  repository: sriharshav54/userapi
+  tag: v1.4
+
+containerPort: 5000
+
+secret:
+  password: password # can be passed thorugh our pipeline as a secret.
+
+env:
+  dbRootPassword:
+    secretName: db-credentials
+    secretKey: password
+  dbName: mysql
+  mysqlServiceHost: test-mysql-database
+  mysqlServicePort: "5432"
+
+resources:
+  limits:
+    cpu: "2"
+    memory: 4096Mi
+  requests:
+    cpu: "1"
+    memory: 1024Mi

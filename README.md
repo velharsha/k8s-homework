@@ -68,7 +68,12 @@ Step3: Push the docker image
 
 - The built image is already included in the deployment file so no need to make any chnages to the image.
 
-  
+### You can also deploy the app using the Helm chart with below commands
+
+    $ cd k8s-worker/
+
+     $ helm install test-userpai -f ./test-userapi/values.yaml ./test-userapi/ -n test-userapi
+
 
 **Step 1:** To deploy the application
 

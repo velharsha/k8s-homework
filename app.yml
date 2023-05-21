@@ -1,3 +1,5 @@
+## This is basically a hardcoded k8s objects added in one single file.
+
 ---
 apiVersion: apps/v1
 kind: Deployment

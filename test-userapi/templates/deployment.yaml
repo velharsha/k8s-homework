@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "mychart.fullname" . }}
+  labels:
+    app: {{ include "mychart.name" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "mychart.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "mychart.name" . }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.containerPort }}
+          env:
+            - name: db_root_password
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.env.dbRootPassword.secretName }}
+                  key: {{ .Values.env.dbRootPassword.secretKey }}
+            - name: db_name
+              value: {{ .Values.env.dbName }}
+            - name: MYSQL_SERVICE_HOST
+              value: {{ .Values.env.mysqlServiceHost }}
+            - name: MYSQL_SERVICE_PORT
+              value: {{ .Values.env.mysqlServicePort }}
+          resources:
+            limits:
+              cpu: {{ .Values.resources.limits.cpu }}
+              memory: {{ .Values.resources.limits.memory }}
+            requests:
+              cpu: {{ .Values.resources.requests.cpu }}
+              memory: {{ .Values.resources.requests.memory }}
